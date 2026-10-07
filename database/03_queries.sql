@@ -1,3 +1,4 @@
+#chạy tệp dữ liệu mẫu
 SELECT 'students' AS table_name, COUNT(*) AS row_count
 FROM students
 UNION ALL SELECT 'courses', COUNT(*) FROM courses
@@ -6,16 +7,19 @@ UNION ALL SELECT 'lecturers', COUNT(*) FROM lecturers
 UNION ALL SELECT 'class_sections', COUNT(*) FROM class_sections
 UNION ALL SELECT 'enrollments', COUNT(*) FROM enrollments;
 
+#Hiển thị danh sách học phần
 SELECT code, name, credits
 FROM courses
 ORDER BY code;
 
+#Tìm học phần theo một phần mã hoặc tên
 SELECT code, name
 FROM courses
 WHERE LOWER(code) LIKE '%web%'
 OR LOWER(name) LIKE '%web%'
 ORDER BY code;
 
+#Xem các lớp Minh Anh đã đăng ký
 SELECT student_id, class_section_id
 FROM enrollments
 WHERE student_id = '22000001'
@@ -31,6 +35,7 @@ JOIN courses AS c ON c.code = cs.course_code
 WHERE s.id = '22000001'
 ORDER BY cs.id;
 
+#Đếm số đăng ký và tính số chỗ còn lại của từng lớp
 SELECT cs.id AS class_id,
 cs.course_code,
 cs.capacity,
@@ -41,6 +46,7 @@ LEFT JOIN enrollments AS e ON e.class_section_id = cs.id
 GROUP BY cs.id, cs.course_code, cs.capacity
 ORDER BY cs.id;
 
+#Tìm sinh viên chưa đăng ký lớp nào
 SELECT s.id, s.name
 FROM students AS s
 WHERE NOT EXISTS (
@@ -50,6 +56,7 @@ WHERE e.student_id = s.id
 )
 ORDER BY s.id;
 
+#Dùng CTE để lấy các lớp còn chỗ
 WITH section_counts AS (
 SELECT cs.id AS class_id,
 cs.capacity,
@@ -64,6 +71,7 @@ FROM section_counts
 WHERE enrolled < capacity
 ORDER BY class_id;
 
+#Xếp hạng học phần theo số lượt đăng ký
 WITH course_totals AS (
 SELECT c.code, COUNT(e.student_id) AS total
 FROM courses AS c

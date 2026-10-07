@@ -1,3 +1,4 @@
+#Tạo bảng students và courses
 CREATE TABLE students (
 id VARCHAR(8) NOT NULL PRIMARY KEY,
 name VARCHAR(100) NOT NULL,
@@ -16,6 +17,7 @@ CONSTRAINT ck_courses_credits
 CHECK (credits BETWEEN 1 AND 6)
 );
 
+#Tạo bảng semesters và lecturers
 CREATE TABLE semesters (
 code VARCHAR(10) NOT NULL PRIMARY KEY,
 name VARCHAR(80) NOT NULL,
@@ -30,6 +32,7 @@ id VARCHAR(10) NOT NULL PRIMARY KEY,
 name VARCHAR(100) NOT NULL
 );
 
+#Tạo bảng class_sections và enrollments
 CREATE TABLE class_sections (
 id VARCHAR(20) NOT NULL PRIMARY KEY,
 course_code VARCHAR(10) NOT NULL

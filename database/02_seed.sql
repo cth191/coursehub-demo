@@ -1,3 +1,4 @@
+#Nhập sinh viên và học phần
 INSERT INTO students (id, name, major, email) VALUES
 ('22000001', 'Nguyen Minh Anh', 'KHDL', 'anh@example.com'),
 ('22000002', 'Tran Duc Long', 'KHDL', 'long@example.com'),
@@ -9,6 +10,7 @@ INSERT INTO courses (code, name, credits) VALUES
 ('INT2205', 'Khai pha du lieu', 3),
 ('INT2206', 'Lap trinh Python', 2);
 
+#Nhập học kỳ, giảng viên và lớp học phần
 INSERT INTO semesters
 (code, name, start_date, end_date) VALUES
 ('2026-1', 'Hoc ky I - 2026', '2026-09-01', '2027-01-31');
@@ -25,6 +27,7 @@ VALUES
 ('DM-01', 'INT2205', '2026-1', 'GV02', 2),
 ('PY-01', 'INT2206', '2026-1', 'GV02', 2);
 
+#Nhập đăng ký
 INSERT INTO enrollments (student_id, class_section_id) VALUES
 ('22000001', 'WEB-01'),
 ('22000002', 'WEB-01'),
