@@ -305,3 +305,58 @@ def delete_enrollment(student_id: str, class_section_id: str) -> Response:
         connection.execute(text(event_sql), parameters)
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@app.get("/enrollment-events")
+def get_enrollment_events(
+    student_id: str | None = None,
+    event_type: str | None = None,
+    skip: int = Query(default=0, ge=0),
+    limit: int = Query(default=20, ge=1, le=100),
+):
+    conditions = []
+    
+    parameters = {
+        "skip": skip,
+        "limit": limit,
+    }
+
+    if student_id is not None:
+        conditions.append("student_id = :student_id")
+        parameters["student_id"] = student_id
+
+    if event_type is not None:
+        conditions.append("event_type = :event_type")
+        parameters["event_type"] = event_type
+
+    sql = """
+        SELECT
+            id,
+            student_id,
+            class_section_id,
+            event_type,
+            source,
+            dataset,
+            occurred_at
+        FROM enrollment_events
+    """
+
+    if conditions:
+        sql += " WHERE " + " AND ".join(conditions)
+
+    # Sap xep va phan trang
+    sql += """
+        ORDER BY occurred_at DESC, id DESC
+        LIMIT :limit
+        OFFSET :skip
+    """
+
+    with engine.connect() as connection:
+        rows = connection.execute(
+            text(sql),
+            parameters
+        ).mappings().all()
+
+    return [dict(row) for row in rows]
+
+
