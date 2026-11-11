@@ -1,0 +1,14 @@
+$kind: http-request
+name: New Request
+url: "{{base_url}}/enrollments"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"student_id\": \"22000002\",\r
+
+    \  \"class_section_id\": \"RACE-01\"\r
+
+    }"
+order: 12000
