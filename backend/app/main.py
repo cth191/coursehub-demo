@@ -318,57 +318,74 @@ def delete_enrollment(student_id: str, class_section_id: str) -> Response:
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
-
 @app.get("/enrollment-events")
 def get_enrollment_events(
-    student_id: str | None = None,
-    event_type: str | None = None,
-    skip: int = Query(default=0, ge=0),
-    limit: int = Query(default=20, ge=1, le=100),
+    student_id: str,
+    page: int = Query(1, ge=1),
+    page_size: int = Query(10, ge=1, le=50)
 ):
-    conditions = []
-    
-    parameters = {
-        "skip": skip,
-        "limit": limit,
+    # Bước 1: Tính vị trí bắt đầu lấy dữ liệu
+    offset = (page - 1) * page_size
+
+    # Bước 2: Chuẩn bị tham số truy vấn
+    params = {
+        "student_id": student_id,
+        "dataset": "demo"
     }
 
-    if student_id is not None:
-        conditions.append("student_id = :student_id")
-        parameters["student_id"] = student_id
-
-    if event_type is not None:
-        conditions.append("event_type = :event_type")
-        parameters["event_type"] = event_type
-
-    sql = """
-        SELECT
-            id,
-            student_id,
-            class_section_id,
-            event_type,
-            source,
-            dataset,
-            occurred_at
-        FROM enrollment_events
-    """
-
-    if conditions:
-        sql += " WHERE " + " AND ".join(conditions)
-
-    # Sap xep va phan trang
-    sql += """
-        ORDER BY occurred_at DESC, id DESC
-        LIMIT :limit
-        OFFSET :skip
-    """
-
     with engine.connect() as connection:
-        rows = connection.execute(
-            text(sql),
-            parameters
-        ).mappings().all()
 
-    return [dict(row) for row in rows]
+        # Bước 3: Đếm tổng số sự kiện demo
+        total = connection.execute(
+            text("""
+                SELECT COUNT(*)
+                FROM enrollment_events
+                WHERE student_id = :student_id
+                  AND dataset = :dataset
+            """),
+            params
+        ).scalar_one()
 
+        # Bước 4: Lấy danh sách sự kiện của trang hiện tại
+        result = connection.execute(
+            text("""
+                SELECT
+                    id,
+                    student_id,
+                    class_section_id,
+                    event_type,
+                    source,
+                    dataset,
+                    occurred_at
+                FROM enrollment_events
+                WHERE student_id = :student_id
+                  AND dataset = :dataset
+                ORDER BY occurred_at DESC, id DESC
+                LIMIT :page_size
+                OFFSET :offset
+            """),
+            {
+                **params,
+                "page_size": page_size,
+                "offset": offset
+            }
+        )
+
+        # Bước 5: Chuyển các dòng dữ liệu thành danh sách
+        items = [
+            dict(row._mapping)
+            for row in result
+        ]
+
+    # Bước 6: Tính tổng số trang
+    total_pages = (total + page_size - 1) // page_size
+
+    # Bước 7: Trả kết quả cho Frontend
+    return {
+        "items": items,
+        "page": page,
+        "page_size": page_size,
+        "total": total,
+        "total_pages": total_pages
+    }
 

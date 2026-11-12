@@ -75,3 +75,26 @@ footer { color: #63738a; font-size: 12px; padding: 3px 4px 18px; }
   .student-form input { flex: 1; }
   table { min-width: 550px; }
 }
+.filters select {
+    border: 1px solid #9dacbd;
+    border-radius: 7px;
+    padding: 9px 11px;
+    font: inherit;
+    background: #fff;
+    min-width: 170px;
+}
+
+/* Lich su dang ky */
+.history-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.history-pagination span {
+    font-size: 13px;
+    color: #52667c;
+}
